@@ -1,0 +1,14 @@
+<header class="header">
+  <h1>todos</h1>
+
+  <form (ngSubmit)="onSubmit()">
+    <input
+      type="text"
+      class="new-todo"
+      placeholder="What needs to be done?"
+      [(ngModel)]="inputValue"
+      name="todo"
+      autocomplete="off"
+    >
+  </form>
+</header>

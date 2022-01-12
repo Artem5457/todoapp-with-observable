@@ -1,0 +1,26 @@
+<li
+  (dblclick)="changeMode()"
+  [ngClass]="{
+    completed: todo.completed,
+    editing: editMode
+  }"
+>
+  <div *ngIf="!editMode else editModeTpl" class="view">
+    <input 
+      type="checkbox" 
+      class="toggle" 
+      [checked]="todo.completed" 
+      (change)="completeChange(todo)"
+    />
+
+    <label>
+      {{ todo.title }}
+    </label>
+
+    <button type="button" class="destroy" (click)="removeItem()"></button>
+  </div>
+
+  <ng-template #editModeTpl>
+    <input type="text" class="edit" [(ngModel)]="editTitle" (keyup)="onKeyUp($event)" />
+  </ng-template>
+</li>
