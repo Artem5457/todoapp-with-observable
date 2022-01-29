@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, BehaviorSubject, Observable, tap, filter, map, combineLatest } from 'rxjs';
 import { Todo } from './interface';
@@ -11,17 +11,15 @@ import { TodosService } from './todos-service.service';
   styleUrls: ['./app.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnInit, DoCheck {
+export class AppComponent implements OnInit {
   visibleTodos$!: Observable<Todo[]>;
   notCompletedTodos$!: Observable<Todo[]>;
-  todos: Todo[] = this.locStorage.getLocalStorage('todos');;
   buttonStatus: boolean = false;
   filter = new BehaviorSubject<string>('all');
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private locStorage: LocalStorageService,
     private todosService: TodosService
   ) { }
 
@@ -32,7 +30,7 @@ export class AppComponent implements OnInit, DoCheck {
     //   this.filter = value['filter'];
     //   console.log('Filter: ', this.filter);
     // });
- 
+
     this.visibleTodos$ = combineLatest(
       this.todosService.todos$,
       this.route.queryParams
@@ -59,14 +57,10 @@ export class AppComponent implements OnInit, DoCheck {
         console.log('this.buttonStatus', this.buttonStatus)
         this.buttonStatus = todo.some(el => el.completed)
       }),
-      map((todos) => todos.filter((todo) => !todo.completed)), 
+      map((todos) => todos.filter((todo) => !todo.completed)),
     );
 
-    
-  }
 
-  ngDoCheck() {
-    // this.buttonStatus = this.todosService.todos$.value.some(el => el.completed);
   }
 
   // This method filters todolist by click
@@ -77,7 +71,7 @@ export class AppComponent implements OnInit, DoCheck {
   // Next methods transform list
   addTodo(newTodo: Todo) {
     this.todosService.addTodo(newTodo);
-    
+
   }
 
   updateTodos(allTodosStatus: boolean) {

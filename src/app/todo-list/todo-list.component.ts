@@ -17,10 +17,9 @@ export class TodoListComponent implements DoCheck {
     // console.log('Todo-list: ', this.todos);
   }
 
-  //  Спросить за правильное изменение todos
   toggleAllTodos() {
     this.allTodosStatus = !this.allTodosStatus;
-    
+
     this.sendToggleAllStatus.emit(this.allTodosStatus);
   }
 }
