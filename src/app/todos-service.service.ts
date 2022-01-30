@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { Todo } from './interface';
 import { LocalStorageService } from './localStorage.service';
@@ -8,15 +7,11 @@ import { LocalStorageService } from './localStorage.service';
   providedIn: 'root'
 })
 export class TodosService {
-  // We do not subscribe in services
   todos$ = new BehaviorSubject<Todo[]>([]);
 
   constructor(
-    private locStorage: LocalStorageService,
-    private router: Router,
-  ) {
-    this.todos$.next(this.locStorage.getLocalStorage('todos'));
-  }
+    // private locStorage: LocalStorageService
+  ) { }
 
   addTodo(newTodo: Todo): void {
     this.todos$.next([
@@ -24,13 +19,13 @@ export class TodosService {
       newTodo
     ]);
 
-    this.locStorage.setLocalStorage('todos', this.todos$.value);
+    // this.locStorage.setLocalStorage('todos', this.todos$.value);
   }
 
   deleteTodo(todo: Todo): void {
     this.todos$.next(this.todos$.value.filter(item => todo.id !== item.id));
 
-    this.locStorage.setLocalStorage('todos', this.todos$.value);
+    // this.locStorage.setLocalStorage('todos', this.todos$.value);
   }
 
   changeStatus(todo: Todo): void {
@@ -46,7 +41,7 @@ export class TodosService {
       return item;
     }));
 
-    this.locStorage.setLocalStorage('todos', this.todos$.value);
+    // this.locStorage.setLocalStorage('todos', this.todos$.value);
   }
 
   changeTitle(todo: Todo) {
@@ -60,19 +55,15 @@ export class TodosService {
       return item;
     }));
 
-    this.locStorage.setLocalStorage('todos', this.todos$.value);
+    // this.locStorage.setLocalStorage('todos', this.todos$.value);
   }
 
   completedRemove() {
-    this.router.navigate([''], { queryParams: { filter: 'all' } });
-
     this.todos$.next(this.todos$.value.filter(item => !item.completed));
-    this.locStorage.setLocalStorage('todos', this.todos$.value);
+    // this.locStorage.setLocalStorage('todos', this.todos$.value);
   }
 
   updateTodos(allTodosStatus: boolean) {
-    // this.todosService.updateTodo(newTodo);
-    
     this.todos$.next(this.todos$.value.map(item => {
       return {
         ...item,
@@ -80,6 +71,6 @@ export class TodosService {
       }
     }));
 
-    this.locStorage.setLocalStorage('todos', this.todos$.value);
+    // this.locStorage.setLocalStorage('todos', this.todos$.value);
   }
 }

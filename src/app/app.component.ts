@@ -1,9 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, BehaviorSubject, Observable, tap, filter, map, combineLatest } from 'rxjs';
-import { Todo } from './interface';
-import { LocalStorageService } from './localStorage.service';
+import {BehaviorSubject, Observable, tap, map, combineLatest, filter} from 'rxjs';
+import {Todo, Todo1, userId} from './interface';
 import { TodosService } from './todos-service.service';
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-root',
@@ -12,66 +11,36 @@ import { TodosService } from './todos-service.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
-  visibleTodos$!: Observable<Todo[]>;
-  notCompletedTodos$!: Observable<Todo[]>;
+  visibleTodos: Todo1[];
+  // notCompletedTodos$!: Observable<Todo1[]>;
   buttonStatus: boolean = false;
-  filter = new BehaviorSubject<string>('all');
+  filter$ = new BehaviorSubject<string>('all');
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private todosService: TodosService
-  ) { }
+    private todosService: TodosService,
+    private http: HttpClient
+  ) {
+    this.filter$.next('all');
+  }
 
   ngOnInit(): void {
-    // const filter = this.route.snapshot.queryParamMap.get('filter');
-    // this.route.queryParams.subscribe((value) => {
-    //   console.log('Filter: from subscribe', value);
-    //   this.filter = value['filter'];
-    //   console.log('Filter: ', this.filter);
-    // });
-
-    this.visibleTodos$ = combineLatest(
-      this.todosService.todos$,
-      this.route.queryParams
-    ).pipe(
-      tap(([todos]) => {
-        console.log('actual todos', todos)
-      }),
-      map(([todos, {filter}]) => {
-        console.log('todoFilter', filter);
-        if (filter === 'all') {
-          return todos;
-        } else if (filter === 'active') {
-          return todos.filter(item => item.completed === false);
-        }
-
-        return todos.filter(item => item.completed === true);
-      })
-
-    )
-
-    this.notCompletedTodos$ = this.todosService.todos$.pipe(
-      tap((todo) => {
-        console.log('todo', todo)
-        console.log('this.buttonStatus', this.buttonStatus)
-        this.buttonStatus = todo.some(el => el.completed)
-      }),
-      map((todos) => todos.filter((todo) => !todo.completed)),
-    );
-
-
+    this.http.get<Todo1[]>('https://mate.academy/students-api/todos')
+      .subscribe((todos) => {
+      this.visibleTodos = todos.filter(todo => todo.userId === userId);
+      console.log('Todos: ', this.visibleTodos);
+    })
   }
 
-  // This method filters todolist by click
   onFilterChange(value: string) {
-    this.router.navigate([''], { queryParams: { filter: value } });
+    this.filter$.next(value);
   }
 
-  // Next methods transform list
   addTodo(newTodo: Todo) {
-    this.todosService.addTodo(newTodo);
-
+    // this.todosService.addTodo(newTodo);
+    // this.http.post<Todo>('https://mate.academy/students-api/todos', newTodo).subscribe(res => {
+    //  this.visibleTodos = [...this.visibleTodos, res];
+    //  console.log('Res: ', res);
+    // })
   }
 
   updateTodos(allTodosStatus: boolean) {

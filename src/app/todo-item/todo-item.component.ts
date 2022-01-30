@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Todo } from '../interface';
+import {Todo, Todo1} from '../interface';
 
 @Component({
   selector: 'app-todo-item',
@@ -7,11 +7,11 @@ import { Todo } from '../interface';
   styleUrls: ['./todo-item.component.css']
 })
 export class TodoItemComponent implements OnInit {
-  @Input() todo!: Todo;
+  @Input() todo!: Todo1;
   @Output() onRemove: EventEmitter<Todo> = new EventEmitter<Todo>();
   @Output() onChange: EventEmitter<Todo> = new EventEmitter<Todo>();
-  @Output() onChangeTitle: EventEmitter<Todo> = new EventEmitter<Todo>();
-  
+  // @Output() onChangeTitle: EventEmitter<Todo> = new EventEmitter<Todo>();
+
   editMode: boolean = false;
   editTitle: string = this.todo === undefined ? '' : this.todo.title;
 
@@ -26,16 +26,16 @@ export class TodoItemComponent implements OnInit {
   }
 
   removeItem() {
-    this.onRemove.emit(this.todo);
+    // this.onRemove.emit(this.todo);
   }
-  
+
   handleTodoEdit(editTitle: string) {
     this.todo = {
       ...this.todo,
       title: editTitle
     }
 
-    this.onChangeTitle.emit(this.todo);
+    // this.onChangeTitle.emit(this.todo);
   }
 
   onKeyUp(event: KeyboardEvent) {

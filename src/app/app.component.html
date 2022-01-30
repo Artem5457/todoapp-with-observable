@@ -4,20 +4,19 @@
   <app-todo-list
     (sendToggleAllStatus)="updateTodos($event)"
   >
-    <ng-container *ngFor="let todo of visibleTodos$ | async">
+    <ng-container *ngFor="let todo of visibleTodos">
       <app-todo-item
         [todo]="todo"
         (onRemove)="deleteTodo($event)"
         (onChange)="changeStatus($event)"
-        (onChangeTitle)="changeTitle($event)"
       ></app-todo-item>
     </ng-container>
   </app-todo-list>
 
   <footer class="footer">
-    <span class="todo-count" *ngIf="(notCompletedTodos$ | async)?.length > 0">
-      {{ (notCompletedTodos$ | async)?.length }} items left
-    </span>
+<!--    <span class="todo-count" *ngIf="(notCompletedTodos$ | async)?.length > 0">-->
+<!--      {{ (notCompletedTodos$ | async)?.length }} items left-->
+<!--    </span>-->
 
     <ul class="filters">
       <li>
@@ -48,5 +47,4 @@
       Clear completed
     </button>
   </footer>
-
 </section>

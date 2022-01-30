@@ -1,5 +1,4 @@
-import { Component, DoCheck, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
-import { Todo } from '../interface';
+import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-todo-list',
@@ -7,15 +6,11 @@ import { Todo } from '../interface';
   styleUrls: ['./todo-list.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class TodoListComponent implements DoCheck {
+export class TodoListComponent {
   @Output() sendToggleAllStatus: EventEmitter<boolean> = new EventEmitter<boolean>();
   allTodosStatus: boolean = false;
 
   constructor() { }
-
-  ngDoCheck(): void {
-    // console.log('Todo-list: ', this.todos);
-  }
 
   toggleAllTodos() {
     this.allTodosStatus = !this.allTodosStatus;

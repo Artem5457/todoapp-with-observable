@@ -6,11 +6,11 @@
   }"
 >
   <div *ngIf="!editMode else editModeTpl" class="view">
-    <input 
-      type="checkbox" 
-      class="toggle" 
-      [checked]="todo.completed" 
-      (change)="completeChange(todo)"
+    <input
+      type="checkbox"
+      class="toggle"
+      [checked]="todo.completed"
+
     />
 
     <label>
