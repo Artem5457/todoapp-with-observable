@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import {BehaviorSubject, Observable, tap, map, combineLatest, filter} from 'rxjs';
-import {Todo, Todo1, userId} from './interface';
+import {forkJoin, map, Observable, of, tap} from 'rxjs';
+import {Todo1, userId} from './interface';
 import { TodosService } from './todos-service.service';
 import {HttpClient} from "@angular/common/http";
 
@@ -11,55 +11,62 @@ import {HttpClient} from "@angular/common/http";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
-  visibleTodos: Todo1[];
-  // notCompletedTodos$!: Observable<Todo1[]>;
+  visibleTodos$!: Observable<Todo1[]>;
+  notCompletedTodos$!: Observable<Todo1[]>;
   buttonStatus: boolean = false;
-  filter$ = new BehaviorSubject<string>('all');
 
   constructor(
     private todosService: TodosService,
     private http: HttpClient
-  ) {
-    this.filter$.next('all');
-  }
+  ) { }
 
   ngOnInit(): void {
-    this.http.get<Todo1[]>('https://mate.academy/students-api/todos')
+    this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}`)
       .subscribe((todos) => {
-      this.visibleTodos = todos.filter(todo => todo.userId === userId);
-      console.log('Todos: ', this.visibleTodos);
-    })
-  }
+      this.todosService.todos$.next(todos);
+    });
 
-  onFilterChange(value: string) {
-    this.filter$.next(value);
-  }
+    this.visibleTodos$ = this.todosService.todos$;
 
-  addTodo(newTodo: Todo) {
-    // this.todosService.addTodo(newTodo);
-    // this.http.post<Todo>('https://mate.academy/students-api/todos', newTodo).subscribe(res => {
-    //  this.visibleTodos = [...this.visibleTodos, res];
-    //  console.log('Res: ', res);
-    // })
-  }
-
-  updateTodos(allTodosStatus: boolean) {
-    this.todosService.updateTodos(allTodosStatus);
+    this.notCompletedTodos$ = this.todosService.todos$.pipe(
+      tap((todo) => {
+        // console.log('todo', todo)
+        // console.log('this.buttonStatus', this.buttonStatus)
+        this.buttonStatus = todo.some(el => el.completed)
+      }),
+      map((todos) => todos.filter((todo) => !todo.completed)),
+    );
   }
 
   completedRemove() {
-    this.todosService.completedRemove();
+
+    forkJoin(this.todosService.todos$.value.map(item =>
+      item.completed ? this.http.delete<any>(`https://mate.academy/students-api/todos/${item.id}`) : of(item)
+    )).subscribe((data) => this.todosService.todos$.next(data.filter(item => item !== 1)));
+
   }
 
-  deleteTodo(todo: Todo) {
-    this.todosService.deleteTodo(todo);
+  filterByAll() {
+    this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}`)
+      .subscribe(todos => {
+        this.todosService.todos$.next(todos);
+        console.log('Todos: ', todos);
+      })
   }
 
-  changeStatus(todo: Todo) {
-    this.todosService.changeStatus(todo);
+  filterByActive() {
+    this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}&completed=false`)
+      .subscribe(todos => {
+        this.todosService.todos$.next(todos);
+        console.log('Active todos: ', todos);
+      })
   }
 
-  changeTitle(todo: Todo) {
-    this.todosService.changeTitle(todo);
+  filterByCompleted() {
+    this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}&completed=true`)
+      .subscribe(todos => {
+        this.todosService.todos$.next(todos);
+        console.log('Completed todos: ', todos);
+      })
   }
 }

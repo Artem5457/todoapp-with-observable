@@ -1,38 +1,35 @@
 <section class="todoapp">
-  <app-todo-form (addTodo)="addTodo($event)"></app-todo-form>
+  <app-todo-form></app-todo-form>
 
   <app-todo-list
-    (sendToggleAllStatus)="updateTodos($event)"
   >
-    <ng-container *ngFor="let todo of visibleTodos">
+    <ng-container *ngFor="let todo of visibleTodos$ | async">
       <app-todo-item
         [todo]="todo"
-        (onRemove)="deleteTodo($event)"
-        (onChange)="changeStatus($event)"
       ></app-todo-item>
     </ng-container>
   </app-todo-list>
 
   <footer class="footer">
-<!--    <span class="todo-count" *ngIf="(notCompletedTodos$ | async)?.length > 0">-->
-<!--      {{ (notCompletedTodos$ | async)?.length }} items left-->
-<!--    </span>-->
+    <span class="todo-count" *ngIf="(notCompletedTodos$ | async)?.length > 0">
+      {{ (notCompletedTodos$ | async)?.length }} items left
+    </span>
 
     <ul class="filters">
       <li>
-        <a (click)="onFilterChange('all')" class="selected" style="cursor: pointer">
+        <a (click)="filterByAll()" class="selected" style="cursor: pointer">
           All
         </a>
       </li>
 
       <li>
-        <a (click)="onFilterChange('active')" style="cursor: pointer">
+        <a (click)="filterByActive()" style="cursor: pointer">
           Active
         </a>
       </li>
 
       <li>
-        <a (click)="onFilterChange('completed')" style="cursor: pointer">
+        <a (click)="filterByCompleted()" style="cursor: pointer">
           Completed
         </a>
       </li>
