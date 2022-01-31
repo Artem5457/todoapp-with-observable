@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import {forkJoin, map, Observable, of, tap} from 'rxjs';
-import {Todo1, userId} from './interface';
+import { forkJoin, map, Observable, of, tap } from 'rxjs';
+import { Todo1, userId } from './interface';
 import { TodosService } from './todos-service.service';
-import {HttpClient} from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: 'app-root',
@@ -48,7 +48,7 @@ export class AppComponent implements OnInit {
       .subscribe(todos => {
         this.todosService.todos$.next(todos);
         console.log('Todos: ', todos);
-      })
+      });
   }
 
   filterByActive() {
@@ -56,7 +56,7 @@ export class AppComponent implements OnInit {
       .subscribe(todos => {
         this.todosService.todos$.next(todos);
         console.log('Active todos: ', todos);
-      })
+      });
   }
 
   filterByCompleted() {
@@ -64,6 +64,6 @@ export class AppComponent implements OnInit {
       .subscribe(todos => {
         this.todosService.todos$.next(todos);
         console.log('Completed todos: ', todos);
-      })
+      });
   }
 }
