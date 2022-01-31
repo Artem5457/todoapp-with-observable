@@ -7,8 +7,7 @@ import {HttpClient} from "@angular/common/http";
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
   visibleTodos$!: Observable<Todo1[]>;
@@ -30,8 +29,6 @@ export class AppComponent implements OnInit {
 
     this.notCompletedTodos$ = this.todosService.todos$.pipe(
       tap((todo) => {
-        // console.log('todo', todo)
-        // console.log('this.buttonStatus', this.buttonStatus)
         this.buttonStatus = todo.some(el => el.completed)
       }),
       map((todos) => todos.filter((todo) => !todo.completed)),
