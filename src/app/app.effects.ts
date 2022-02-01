@@ -1,7 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Actions, createEffect } from '@ngrx/effects';
+import {Actions, createEffect, ofType} from '@ngrx/effects';
+import { TodosService } from './todos-service.service';
+import { HttpClient } from "@angular/common/http";
+import {Observable, switchMap} from "rxjs";
+import {getTodos} from "./reducers/todos";
 
 @Injectable()
 export class AppEffects {
-  constructor(private actions$: Actions) {}
+  getTodos$: Observable<Actions> = createEffect(() => this.actions$.pipe(
+    ofType(getTodos),
+    switchMap((payload) =>
+      this.todosService
+        )
+  ))
+
+  constructor(
+    private actions$: Actions,
+    private todosService: TodosService,
+    private http: HttpClient
+  ) {}
 }

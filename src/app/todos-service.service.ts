@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import { Todo1, userId } from './interface';
 // import { Todo } from './interface';
 // import { LocalStorageService } from './localStorage.service';
@@ -15,19 +15,19 @@ export class TodosService {
     private http: HttpClient
   ) { }
 
-  addTodo(inputValue: string): void {
-    // this.http.post<Todo1>('https://mate.academy/students-api/todos', {
-    //   userId: userId,
-    //   title: inputValue,
-    //   completed: false
-    // })
+  addTodo(newTodo: Todo1): Observable<Todo1> {
+    return this.http.post<Todo1>('https://mate.academy/students-api/todos', newTodo)
   }
 
-  deleteTodo(todo): void {
-    // this.todos$.next(this.todos$.value.filter(item => todo.id !== item.id));
-
-    // this.locStorage.setLocalStorage('todos', this.todos$.value);
+  getTodos(): Observable<Todo1[]> {
+    return this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}`);
   }
+
+  removeTodo(todo: Todo1): Observable<Todo1> {
+    return this.http.delete<Todo1>(`https://mate.academy/students-api/todos/${todo.id}`);
+  }
+
+  deleteCompletedTodos(): Obser
 
   changeStatus(todo): void {
 
