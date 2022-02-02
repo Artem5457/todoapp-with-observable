@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
 import { Todo1, userId } from './interface';
+import { ToDoStatus } from './reducers/todos';
 
 @Injectable({
   providedIn: 'root'
@@ -38,9 +39,9 @@ export class TodosService {
     });
   }
 
-  changeTitle(todo: Todo1, editTitle: string): Observable<Todo1> {
+  changeTitle(todo: Todo1): Observable<Todo1> {
     return this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${todo.id}`, {
-      title: editTitle
+      title: todo.title
     });
   }
 

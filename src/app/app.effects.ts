@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import { TodosService } from './todos-service.service';
-import { HttpClient } from "@angular/common/http";
 import {map, Observable, switchMap, tap} from "rxjs";
 import {
   addTodo,
   addTodoSuccess,
+  changeTodoTitle,
+  changeTodoTitleSuccess,
   completeTodo,
   completeTodoSuccess,
   getTodos,
@@ -52,6 +53,14 @@ export class AppEffects {
         map((todo) => completeTodoSuccess(todo))
       )
   )));
+
+  changeTodoTitle$: Observable<Action> = createEffect(() => this.actions$.pipe(
+    ofType(changeTodoTitle),
+    switchMap((payload) =>
+      this.todosService.changeTitle(payload).pipe(
+        map((todo) => changeTodoTitleSuccess(todo))
+      ))
+  ))
 
   constructor(
     private actions$: Actions,

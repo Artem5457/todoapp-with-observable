@@ -3,8 +3,6 @@
 import {createAction, createFeatureSelector, createReducer, createSelector, on, props, TypedAction} from "@ngrx/store";
 import {Todo1} from "../interface";
 
-export interface ChangeTodoTitleSuccessActionPayload {payload: Todo1, title: string}
-
 export const TODOS_LIST_KEY = 'todosList';
 
 export enum ToDoStatus {
@@ -25,10 +23,9 @@ export const completeTodo = createAction('[Todos] Complete todo', props<Todo1>()
 export const completeTodoSuccess = createAction('[Todos] Complete todo success', props<Todo1>());
 export const completeAllTodos = createAction('[Todos] Complete all todos');
 export const completeAllTodosSuccess = createAction('[Todos] Complete all todos success', props<{payload: boolean}>());
-export const changeTodoTitle = createAction('[Todos] Change todo title', props<{payload: Todo1}>());
-export const changeTodoTitleSuccess = createAction('[Todos] Change todo title success', props<ChangeTodoTitleSuccessActionPayload>());
+export const changeTodoTitle = createAction('[Todos] Change todo title', props<Todo1>());
+export const changeTodoTitleSuccess = createAction('[Todos] Change todo title success', props<Todo1>());
 export const filterTodos = createAction('[Todos] Filter todos', props<{payload: ToDoStatus}>());
-export const filterTodosSuccess = createAction('[Todos] Filter todos success', props<{payload: ToDoStatus}>());
 
 export interface TodosState {
   todos: Todo1[]
@@ -78,10 +75,10 @@ export const todosReducer = createReducer(
       }
     })
   })),
-  on(changeTodoTitleSuccess, (state, action: TypedAction<string> & ChangeTodoTitleSuccessActionPayload) => ({
+  on(changeTodoTitleSuccess, (state, action) => ({
     ...state,
     todos: state.todos.map(item => {
-      if (item.id === action.payload.id) {
+      if (item.id === action.id) {
         return {
           ...item,
           title: action.title
@@ -91,7 +88,7 @@ export const todosReducer = createReducer(
       return item;
     })
   })),
-  on(filterTodosSuccess, (state, action) => ({
+  on(filterTodos, (state, action) => ({
     ...state,
     status: action.payload
   }))

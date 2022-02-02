@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Todo1 } from '../interface';
-import {completeTodo, removeTodo} from '../reducers/todos';
+import {changeTodoTitle, completeTodo, removeTodo} from '../reducers/todos';
 import { TodosService } from '../todos-service.service';
 
 @Component({
@@ -36,20 +36,10 @@ export class TodoItemComponent implements OnInit {
 
   onKeyUp(event: KeyboardEvent) {
     if (this.editTitle.length > 0 && event.keyCode === 13) {
-      this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${this.todo.id}`, {
+      this.store.dispatch(changeTodoTitle({
+        ...this.todo,
         title: this.editTitle
-      }).subscribe(todo => {
-        this.todosService.todos$.next(this.todosService.todos$.value.map((item => {
-          if (item.id === todo.id) {
-            return {
-              ...item,
-              title: this.editTitle
-            }
-          }
-
-          return item;
-        })))
-      });
+      }))
 
       this.editMode = false;
     } else if (event.keyCode === 27) {
@@ -58,8 +48,6 @@ export class TodoItemComponent implements OnInit {
   }
 
   completeChange() {
-
     this.store.dispatch(completeTodo(this.todo));
-
   }
 }

@@ -1,10 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { forkJoin, map, Observable, of, tap } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { filter, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { Todo1, userId } from './interface';
 import { TodosService } from './todos-service.service';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { getTodos, todosSelector } from './reducers/todos';
+import { filterTodos, getTodos, todosSelector, ToDoStatus } from './reducers/todos';
 
 @Component({
   selector: 'app-root',
@@ -44,26 +44,20 @@ export class AppComponent implements OnInit {
   }
 
   filterByAll() {
-    this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}`)
-      .subscribe(todos => {
-        this.todosService.todos$.next(todos);
-        console.log('Todos: ', todos);
-      });
+    this.store.dispatch(filterTodos({
+      payload: ToDoStatus.ALL
+    }));
   }
 
   filterByActive() {
-    this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}&completed=false`)
-      .subscribe(todos => {
-        this.todosService.todos$.next(todos);
-        console.log('Active todos: ', todos);
-      });
+    this.store.dispatch(filterTodos({
+      payload: ToDoStatus.ACTIVE
+    }))
   }
 
   filterByCompleted() {
-    this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}&completed=true`)
-      .subscribe(todos => {
-        this.todosService.todos$.next(todos);
-        console.log('Completed todos: ', todos);
-      });
+    this.store.dispatch(filterTodos({
+      payload: ToDoStatus.COMPLETED
+    }))
   }
 }
