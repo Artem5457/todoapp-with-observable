@@ -1,15 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
 import { Todo1, userId } from './interface';
-// import { Todo } from './interface';
-// import { LocalStorageService } from './localStorage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodosService {
-  todos$ = new BehaviorSubject<Todo1[] >([]);
+  todos$ = new BehaviorSubject<Todo1[]>([]);
 
   constructor(
     private http: HttpClient
@@ -23,55 +21,34 @@ export class TodosService {
     return this.http.get<Todo1[]>(`https://mate.academy/students-api/todos?userId=${userId}`);
   }
 
-  removeTodo(todo: Todo1): Observable<Todo1> {
-    return this.http.delete<Todo1>(`https://mate.academy/students-api/todos/${todo.id}`);
+  removeTodo(id: number): Observable<number> {
+    console.log(id);
+    return this.http.delete<number>(`https://mate.academy/students-api/todos/${id}`);
   }
 
-  deleteCompletedTodos(): Obser
-
-  changeStatus(todo): void {
-
-    // this.todos$.next(this.todos$.value.map(item => {
-    //   if (item.id === todo.id) {
-    //     return {
-    //       ...item,
-    //       completed: !item.completed
-    //     }
-    //   }
-
-    //   return item;
-    // }));
-
-    // this.locStorage.setLocalStorage('todos', this.todos$.value);
+  deleteCompletedTodos(): Observable<Todo1[]> {
+    return forkJoin(this.todos$.value.map(item =>
+      item.completed ? this.http.delete<any>(`https://mate.academy/students-api/todos/${item.id}`) : of(item)
+    ));
   }
 
-  changeTitle(todo) {
-    // this.todos$.next(this.todos$.value.map(item => {
-    //   if (item.id === todo.id) {
-    //     return {
-    //       ...todo
-    //     }
-    //   }
-
-    //   return item;
-    // }));
-
-    // this.locStorage.setLocalStorage('todos', this.todos$.value);
+  changeStatus(todo: Todo1): Observable<Todo1> {
+    return this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${todo.id}`, {
+      completed: !todo.completed
+    });
   }
 
-  completedRemove() {
-    // this.todos$.next(this.todos$.value.filter(item => !item.completed));
-    // this.locStorage.setLocalStorage('todos', this.todos$.value);
+  changeTitle(todo: Todo1, editTitle: string): Observable<Todo1> {
+    return this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${todo.id}`, {
+      title: editTitle
+    });
   }
 
-  updateTodos(allTodosStatus: boolean) {
-    // this.todos$.next(this.todos$.value.map(item => {
-    //   return {
-    //     ...item,
-    //     completed: allTodosStatus
-    //   }
-    // }));
+  toggleAllTodos(allTodosStatus: boolean): Observable<Todo1[]>{
 
-    // this.locStorage.setLocalStorage('todos', this.todos$.value);
+    return forkJoin(this.todos$.value.map(item =>
+      this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${item.id}`, {
+        completed: allTodosStatus
+      })));
   }
 }

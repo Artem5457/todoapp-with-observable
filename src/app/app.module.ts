@@ -8,10 +8,13 @@ import { TodoFormComponent } from './todo-form/todo-form.component';
 import { TodoItemComponent } from './todo-item/todo-item.component';
 import { TodoListComponent } from './todo-list/todo-list.component';
 import {HttpClientModule} from "@angular/common/http";
+// @ts-ignore
 import { StoreModule } from '@ngrx/store';
 import { reducers, metaReducers } from './reducers';
+// @ts-ignore
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
+// @ts-ignore
 import { EffectsModule } from '@ngrx/effects';
 import { AppEffects } from './app.effects';
 

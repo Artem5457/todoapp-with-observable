@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {Todo1, userId} from '../interface';
-import {HttpClient} from "@angular/common/http";
-import {TodosService} from "../todos-service.service";
+import { Store } from '@ngrx/store';
+import { addTodo } from '../reducers/todos';
 
 @Component({
   selector: 'app-todo-form',
@@ -12,23 +12,17 @@ export class TodoFormComponent {
   inputValue: string = '';
 
   constructor(
-    private http: HttpClient,
-    private todos: TodosService
+    private store: Store
   ) { }
 
   onSubmit(): void {
     if (this.inputValue.length > 0) {
 
-      this.http.post<Todo1>('https://mate.academy/students-api/todos', {
+      this.store.dispatch(addTodo({
         userId: userId,
         title: this.inputValue,
         completed: false
-      }).subscribe(todo => {
-        this.todos.todos$.next([
-          todo,
-          ...this.todos.todos$.value
-        ]);
-      })
+      }));
 
       this.inputValue = '';
     }

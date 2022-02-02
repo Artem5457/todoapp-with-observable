@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { Todo1 } from '../interface';
+import {completeTodo, removeTodo} from '../reducers/todos';
 import { TodosService } from '../todos-service.service';
 
 @Component({
@@ -16,7 +18,8 @@ export class TodoItemComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private todosService: TodosService
+    private todosService: TodosService,
+    private store: Store
   ) { }
 
   ngOnInit(): void {
@@ -28,19 +31,8 @@ export class TodoItemComponent implements OnInit {
   }
 
   removeItem() {
-    this.http.delete<Todo1>(`https://mate.academy/students-api/todos/${this.todo.id}`)
-      .subscribe(todo => {
-        this.todosService.todos$.next(this.todosService.todos$.value.filter(item => item.id !== this.todo.id));
-        console.log('Todo: ', todo);
-      });
+    this.store.dispatch(removeTodo(this.todo));
   }
-
-  // handleTodoEdit(editTitle: string) {
-  //   this.todo = {
-  //     ...this.todo,
-  //     title: editTitle
-  //   }
-  // }
 
   onKeyUp(event: KeyboardEvent) {
     if (this.editTitle.length > 0 && event.keyCode === 13) {
@@ -67,20 +59,7 @@ export class TodoItemComponent implements OnInit {
 
   completeChange() {
 
-    this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${this.todo.id}`, {
-      completed: !this.todo.completed
-    }).subscribe(todo => {
-      this.todosService.todos$.next(this.todosService.todos$.value.map(item => {
-        if (item.id === todo.id) {
-          return {
-            ...item,
-            completed: !item.completed
-           }
-        }
-
-        return item;
-      }));
-    });
+    this.store.dispatch(completeTodo(this.todo));
 
   }
 }
