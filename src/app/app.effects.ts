@@ -7,6 +7,8 @@ import {
   addTodoSuccess,
   changeTodoTitle,
   changeTodoTitleSuccess,
+  completeAllTodos,
+  completeAllTodosSuccess,
   completeTodo,
   completeTodoSuccess,
   getTodos,
@@ -59,6 +61,15 @@ export class AppEffects {
     switchMap((payload) =>
       this.todosService.changeTitle(payload).pipe(
         map((todo) => changeTodoTitleSuccess(todo))
+      ))
+  ));
+
+  completeAllTodos$: Observable<Action> = createEffect(() => this.actions$.pipe(
+    ofType(completeAllTodos),
+    switchMap((payload) =>
+      // @ts-ignore
+      this.todosService.toggleAllTodos(payload).pipe(
+        map((todo) => completeAllTodosSuccess({payload: todo}))
       ))
   ))
 

@@ -2,7 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Component, ViewEncapsulation } from '@angular/core';
 import { Todo1 } from '../interface';
 import { TodosService } from '../todos-service.service';
-import {forkJoin} from "rxjs";
+import { forkJoin } from "rxjs";
+import { Store } from '@ngrx/store';
+import { completeAllTodos } from '../reducers/todos';
 
 @Component({
   selector: 'app-todo-list',
@@ -14,16 +16,12 @@ export class TodoListComponent {
   allTodosStatus: boolean = false;
 
   constructor(
-    private http: HttpClient,
-    private todosService: TodosService
+    private store: Store
   ) { }
 
   toggleAllTodos() {
     this.allTodosStatus = !this.allTodosStatus;
 
-    forkJoin(this.todosService.todos$.value.map(item =>
-      this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${item.id}`, {
-        completed: this.allTodosStatus
-      }))).subscribe(data => this.todosService.todos$.next(data));
+    this.store.dispatch(completeAllTodos({payload: this.allTodosStatus}));
   }
 }

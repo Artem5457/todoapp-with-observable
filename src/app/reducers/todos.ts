@@ -8,7 +8,7 @@ export const TODOS_LIST_KEY = 'todosList';
 export enum ToDoStatus {
   ALL = 'ALL',
   ACTIVE = 'ACTIVE',
-  COMPLETED = 'COMPLETED', 
+  COMPLETED = 'COMPLETED',
 }
 
 export const getTodos = createAction('[Todos] Get todos');
@@ -21,8 +21,8 @@ export const deleteCompletedTodos = createAction('[Todos] Delete completed todos
 export const deleteCompletedTodosSuccess = createAction('[Todos] Delete completed todos success');
 export const completeTodo = createAction('[Todos] Complete todo', props<Todo1>());
 export const completeTodoSuccess = createAction('[Todos] Complete todo success', props<Todo1>());
-export const completeAllTodos = createAction('[Todos] Complete all todos');
-export const completeAllTodosSuccess = createAction('[Todos] Complete all todos success', props<{payload: boolean}>());
+export const completeAllTodos = createAction('[Todos] Complete all todos', props<{payload: boolean}>());
+export const completeAllTodosSuccess = createAction('[Todos] Complete all todos success', props<{payload: Todo1[]}>());
 export const changeTodoTitle = createAction('[Todos] Change todo title', props<Todo1>());
 export const changeTodoTitleSuccess = createAction('[Todos] Change todo title success', props<Todo1>());
 export const filterTodos = createAction('[Todos] Filter todos', props<{payload: ToDoStatus}>());
@@ -68,12 +68,7 @@ export const todosReducer = createReducer(
   })),
   on(completeAllTodosSuccess, (state, action) => ({
     ...state,
-    todos: state.todos.map(item => {
-      return {
-        ...item,
-        completed: action.payload
-      }
-    })
+    todos: action.payload
   })),
   on(changeTodoTitleSuccess, (state, action) => ({
     ...state,
@@ -108,8 +103,3 @@ export const todosSelector = createSelector(
     return state.todos
   }
 );
-
-// export const visibleSelector = createSelector(
-//   featureTodosSelector,
-//   state => state.todos.filter(item =>)
-// );
