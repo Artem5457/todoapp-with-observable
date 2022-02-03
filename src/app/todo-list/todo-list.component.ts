@@ -1,8 +1,4 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, ViewEncapsulation } from '@angular/core';
-import { Todo1 } from '../interface';
-import { TodosService } from '../todos-service.service';
-import { forkJoin } from "rxjs";
+import {Component, EventEmitter, Output, ViewEncapsulation} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { completeAllTodos } from '../reducers/todos';
 
@@ -13,15 +9,16 @@ import { completeAllTodos } from '../reducers/todos';
   encapsulation: ViewEncapsulation.None
 })
 export class TodoListComponent {
+  @Output() changeAllTodosStatus: EventEmitter<boolean> = new EventEmitter<boolean>();
   allTodosStatus: boolean = false;
 
   constructor(
-    private store: Store
+    // private store: Store
   ) { }
 
   toggleAllTodos() {
     this.allTodosStatus = !this.allTodosStatus;
 
-    this.store.dispatch(completeAllTodos({payload: this.allTodosStatus}));
+    this.changeAllTodosStatus.emit(this.allTodosStatus);
   }
 }

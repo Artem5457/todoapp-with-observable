@@ -1,14 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Todo1, userId } from './interface';
-import { ToDoStatus } from './reducers/todos';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodosService {
-  todos$ = new BehaviorSubject<Todo1[]>([]);
 
   constructor(
     private http: HttpClient
@@ -23,33 +21,10 @@ export class TodosService {
   }
 
   removeTodo(id: number): Observable<number> {
-    console.log(id);
     return this.http.delete<number>(`https://mate.academy/students-api/todos/${id}`);
   }
 
-  deleteCompletedTodos(): Observable<Todo1[]> {
-    return forkJoin(this.todos$.value.map(item =>
-      item.completed ? this.http.delete<any>(`https://mate.academy/students-api/todos/${item.id}`) : of(item)
-    ));
-  }
-
-  changeStatus(todo: Todo1): Observable<Todo1> {
-    return this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${todo.id}`, {
-      completed: !todo.completed
-    });
-  }
-
-  changeTitle(todo: Todo1): Observable<Todo1> {
-    return this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${todo.id}`, {
-      title: todo.title
-    });
-  }
-
-  toggleAllTodos(allTodosStatus: boolean): Observable<Todo1[]>{
-
-    return forkJoin(this.todos$.value.map(item =>
-      this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${item.id}`, {
-        completed: allTodosStatus
-      })));
+  patchTodo(todoId: number, patchedProps: {  completed?: boolean, title?: string}): Observable<Todo1> {
+    return this.http.patch<Todo1>(`https://mate.academy/students-api/todos/${todoId}`, patchedProps);
   }
 }

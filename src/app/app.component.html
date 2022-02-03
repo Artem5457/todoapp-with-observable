@@ -2,6 +2,7 @@
   <app-todo-form></app-todo-form>
 
   <app-todo-list
+    (changeAllTodosStatus)="completeAllTodos($event)"
   >
     <ng-container *ngFor="let todo of visibleTodos$ | async">
       <app-todo-item
@@ -39,7 +40,7 @@
       *ngIf="buttonStatus"
       type="button"
       class="clear-completed"
-      (click)="completedRemove()"
+      (click)="clearCompletedTodos()"
     >
       Clear completed
     </button>

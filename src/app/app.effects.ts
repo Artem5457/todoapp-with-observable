@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import { TodosService } from './todos-service.service';
-import {map, Observable, switchMap, tap} from "rxjs";
+import {forkJoin, map, Observable, switchMap, tap, of} from "rxjs";
 import {
   addTodo,
   addTodoSuccess,
@@ -10,7 +10,7 @@ import {
   completeAllTodos,
   completeAllTodosSuccess,
   completeTodo,
-  completeTodoSuccess,
+  completeTodoSuccess, deleteCompletedTodos, deleteCompletedTodosSuccess,
   getTodos,
   getTodosSuccess,
   removeTodo,
@@ -51,7 +51,7 @@ export class AppEffects {
   changeTodo$: Observable<Action> = createEffect(() => this.actions$.pipe(
     ofType(completeTodo),
     switchMap((payload) =>
-      this.todosService.changeStatus(payload).pipe(
+      this.todosService.patchTodo(payload.id, {completed: !payload.completed}).pipe(
         map((todo) => completeTodoSuccess(todo))
       )
   )));
@@ -59,18 +59,28 @@ export class AppEffects {
   changeTodoTitle$: Observable<Action> = createEffect(() => this.actions$.pipe(
     ofType(changeTodoTitle),
     switchMap((payload) =>
-      this.todosService.changeTitle(payload).pipe(
+      this.todosService.patchTodo(payload.id, {title: payload.title}).pipe(
         map((todo) => changeTodoTitleSuccess(todo))
       ))
   ));
 
   completeAllTodos$: Observable<Action> = createEffect(() => this.actions$.pipe(
     ofType(completeAllTodos),
-    switchMap((payload) =>
-      // @ts-ignore
-      this.todosService.toggleAllTodos(payload).pipe(
-        map((todo) => completeAllTodosSuccess({payload: todo}))
-      ))
+    switchMap((action) => {
+      const observables = action.payload.map(item => this.todosService.patchTodo(item.id, {completed: item.completed}));
+      return forkJoin(observables);
+    }),
+    map((todos) => completeAllTodosSuccess({payload: todos}))
+  ));
+
+  // @ts-ignore
+  clearCompletedTodos$: Observable<Action> = createEffect(() => this.actions$.pipe(
+    ofType(deleteCompletedTodos),
+    switchMap((action) => {
+      const observables = action.payload.map(item => item.completed ? this.todosService.removeTodo(item.id) : of(item));
+      return forkJoin(observables);
+    }),
+    map((todos) => deleteCompletedTodosSuccess({payload: todos}))
   ))
 
   constructor(
@@ -78,3 +88,9 @@ export class AppEffects {
     private todosService: TodosService,
   ) {}
 }
+
+// switchMap((payload) =>
+//   // @ts-ignore
+//   this.todosService.toggleAllTodos(payload).pipe(
+//     map((todo) => completeAllTodosSuccess({payload: todo}))
+//   ))

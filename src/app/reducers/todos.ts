@@ -17,11 +17,11 @@ export const addTodo = createAction('[Todos] Add todo', props<Todo1>());
 export const addTodoSuccess = createAction('[Todos] Add todo success', props<{payload: Todo1}>());
 export const removeTodo = createAction('[Todos] Remove todo', props<Todo1>());
 export const removeTodoSuccess = createAction('[Todos] Remove todo success', props<{payload: number}>());
-export const deleteCompletedTodos = createAction('[Todos] Delete completed todos');
-export const deleteCompletedTodosSuccess = createAction('[Todos] Delete completed todos success');
+export const deleteCompletedTodos = createAction('[Todos] Delete completed todos', props<{payload: Todo1[]}>());
+export const deleteCompletedTodosSuccess = createAction('[Todos] Delete completed todos success', props<{payload: (Todo1 | number)[]}>());
 export const completeTodo = createAction('[Todos] Complete todo', props<Todo1>());
 export const completeTodoSuccess = createAction('[Todos] Complete todo success', props<Todo1>());
-export const completeAllTodos = createAction('[Todos] Complete all todos', props<{payload: boolean}>());
+export const completeAllTodos = createAction('[Todos] Complete all todos', props<{payload: Todo1[]}>());
 export const completeAllTodosSuccess = createAction('[Todos] Complete all todos success', props<{payload: Todo1[]}>());
 export const changeTodoTitle = createAction('[Todos] Change todo title', props<Todo1>());
 export const changeTodoTitleSuccess = createAction('[Todos] Change todo title success', props<Todo1>());
@@ -51,10 +51,10 @@ export const todosReducer = createReducer(
     ...state,
     todos: state.todos.filter(item => item.id !== action.payload)
   })),
-  on(deleteCompletedTodosSuccess, (state) => ({
+  on(deleteCompletedTodosSuccess, (state, action) => ({
     ...state,
     // @ts-ignore
-    todos: state.todos.filter(item => item !== 1)
+    todos: action.payload.filter(item => item !== 1)
   })),
   on(completeTodoSuccess, (state, {type, ...todo1}) => ({
     ...state,

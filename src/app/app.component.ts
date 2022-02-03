@@ -1,10 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { filter, forkJoin, map, Observable, of, tap } from 'rxjs';
-import { Todo1, userId } from './interface';
+import {map, Observable, Subscription, tap} from 'rxjs';
+import { Todo1 } from './interface';
 import { TodosService } from './todos-service.service';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { filterTodos, getTodos, todosSelector, ToDoStatus } from './reducers/todos';
+import {
+  completeAllTodos,
+  deleteCompletedTodos,
+  filterTodos,
+  getTodos,
+  todosSelector,
+  ToDoStatus
+} from './reducers/todos';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +22,8 @@ export class AppComponent implements OnInit {
   visibleTodos$: Observable<Todo1[]> = this.store.select(todosSelector);
   notCompletedTodos$!: Observable<Todo1[]>;
   buttonStatus: boolean = false;
+  visibleTodos: Todo1[] = [];
+  subs: Subscription = new Subscription();
 
   constructor(
     private todosService: TodosService,
@@ -25,22 +34,32 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.store.dispatch(getTodos());
 
-    // this.visibleTodos$ = this.todosService.todos$;
+    this.subs.add(this.visibleTodos$.subscribe((todos) => {
+        this.visibleTodos = todos;
+      })
+    );
 
-    // this.notCompletedTodos$ = this.todosService.todos$.pipe(
-    //   tap((todo) => {
-    //     this.buttonStatus = todo.some(el => el.completed)
-    //   }),
-    //   map((todos) => todos.filter((todo) => !todo.completed)),
-    // );
+    // Спросить завтра об этом моменте
+    this.notCompletedTodos$ = this.visibleTodos$.pipe(
+      tap((todo) => {
+        this.buttonStatus = todo.some(el => el.completed)
+      }),
+      map((todos) => todos.filter((todo) => !todo.completed)),
+    );
   }
 
-  completedRemove() {
+  completeAllTodos(status: boolean) {
+    this.store.dispatch(completeAllTodos({payload: this.visibleTodos.map((todo) => {
+      return {...todo, completed: status}
+      })}));
+  }
 
-    forkJoin(this.todosService.todos$.value.map(item =>
-      item.completed ? this.http.delete<any>(`https://mate.academy/students-api/todos/${item.id}`) : of(item)
-    )).subscribe((data) => this.todosService.todos$.next(data.filter(item => item !== 1)));
+  clearCompletedTodos() {
+    this.store.dispatch(deleteCompletedTodos({payload: this.visibleTodos}));
+  }
 
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   filterByAll() {
@@ -52,12 +71,12 @@ export class AppComponent implements OnInit {
   filterByActive() {
     this.store.dispatch(filterTodos({
       payload: ToDoStatus.ACTIVE
-    }))
+    }));
   }
 
   filterByCompleted() {
     this.store.dispatch(filterTodos({
       payload: ToDoStatus.COMPLETED
-    }))
+    }));
   }
 }
