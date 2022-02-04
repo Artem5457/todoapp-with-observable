@@ -39,7 +39,6 @@ export class AppComponent implements OnInit {
       })
     );
 
-    // Спросить завтра об этом моменте
     this.notCompletedTodos$ = this.visibleTodos$.pipe(
       tap((todo) => {
         this.buttonStatus = todo.some(el => el.completed)

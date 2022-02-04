@@ -14,7 +14,7 @@ import {
   getTodos,
   getTodosSuccess,
   removeTodo,
-  removeTodoSuccess
+  removeTodoSuccess, todosSelector
 } from "./reducers/todos";
 import {Action} from "@ngrx/store";
 import {Todo1} from "./interface";
@@ -68,18 +68,30 @@ export class AppEffects {
     ofType(completeAllTodos),
     switchMap((action) => {
       const observables = action.payload.map(item => this.todosService.patchTodo(item.id, {completed: item.completed}));
-      return forkJoin(observables);
+      return forkJoin(observables).pipe(
+        map(todos => todos.map(item => {
+          return {
+            id: item.id,
+            changes: {
+              ...item,
+              completed: item.completed
+            }
+          };
+        }))
+      );
     }),
     map((todos) => completeAllTodosSuccess({payload: todos}))
   ));
 
-  // @ts-ignore
   clearCompletedTodos$: Observable<Action> = createEffect(() => this.actions$.pipe(
     ofType(deleteCompletedTodos),
     switchMap((action) => {
       const observables = action.payload.map(item => item.completed ? this.todosService.removeTodo(item.id) : of(item));
-      return forkJoin(observables);
+      return forkJoin(observables).pipe(
+        map(todos => todos.filter(item => item !== 1))
+      )
     }),
+    // @ts-ignore
     map((todos) => deleteCompletedTodosSuccess({payload: todos}))
   ))
 
@@ -88,9 +100,3 @@ export class AppEffects {
     private todosService: TodosService,
   ) {}
 }
-
-// switchMap((payload) =>
-//   // @ts-ignore
-//   this.todosService.toggleAllTodos(payload).pipe(
-//     map((todo) => completeAllTodosSuccess({payload: todo}))
-//   ))
