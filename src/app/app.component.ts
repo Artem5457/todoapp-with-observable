@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
   visibleTodos$!: Observable<Todo[]>;
   notCompletedTodos$!: Observable<Todo[]>;
   buttonStatus: boolean = false;
-  filter = new BehaviorSubject<string>('all');
+  filter$ = new BehaviorSubject<string>('all');
 
   constructor(
     private route: ActivatedRoute,
@@ -24,21 +24,14 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // const filter = this.route.snapshot.queryParamMap.get('filter');
-    // this.route.queryParams.subscribe((value) => {
-    //   console.log('Filter: from subscribe', value);
-    //   this.filter = value['filter'];
-    //   console.log('Filter: ', this.filter);
-    // });
-
     this.visibleTodos$ = combineLatest(
       this.todosService.todos$,
-      this.route.queryParams
+      this.filter$
     ).pipe(
       tap(([todos]) => {
         console.log('actual todos', todos)
       }),
-      map(([todos, {filter}]) => {
+      map(([todos, filter]) => {
         console.log('todoFilter', filter);
         if (filter === 'all') {
           return todos;
@@ -65,7 +58,7 @@ export class AppComponent implements OnInit {
 
   // This method filters todolist by click
   onFilterChange(value: string) {
-    this.router.navigate([''], { queryParams: { filter: value } });
+    this.filter$.next(value);
   }
 
   // Next methods transform list
