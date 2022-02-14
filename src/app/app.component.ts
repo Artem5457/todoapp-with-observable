@@ -18,8 +18,6 @@ export class AppComponent implements OnInit {
   filter$ = new BehaviorSubject<string>('all');
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
     private todosService: TodosService
   ) { }
 
